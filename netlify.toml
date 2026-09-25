@@ -1,0 +1,21 @@
+# Netlify build settings for the NACOS Hardware Inventory.
+# The server code runs as a Netlify Function; pages and assets are served from dist/.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Build the server for Netlify instead of Cloudflare (the Lovable default).
+  NITRO_PRESET = "netlify"
+  NODE_VERSION = "22"
+
+# Basic hardening for every page.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "same-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    X-Robots-Tag = "noindex, nofollow"

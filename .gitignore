@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.output
+.wrangler
+.env
+.env.local
+.netlify
+dist

@@ -14,10 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_accounts: {
+        Row: {
+          created_at: string
+          display_name: string
+          failed_attempts: number
+          id: string
+          last_login_at: string | null
+          locked_until: string | null
+          password_hash: string
+          role: Database["public"]["Enums"]["app_role"]
+          session_version: number
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          failed_attempts?: number
+          id?: string
+          last_login_at?: string | null
+          locked_until?: string | null
+          password_hash: string
+          role: Database["public"]["Enums"]["app_role"]
+          session_version?: number
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          failed_attempts?: number
+          id?: string
+          last_login_at?: string | null
+          locked_until?: string | null
+          password_hash?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          session_version?: number
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
           actor_id: string
+          actor_name: string
           changes: Json
           created_at: string
           id: string
@@ -27,6 +70,7 @@ export type Database = {
         Insert: {
           action: string
           actor_id: string
+          actor_name?: string
           changes?: Json
           created_at?: string
           id?: string
@@ -36,6 +80,7 @@ export type Database = {
         Update: {
           action?: string
           actor_id?: string
+          actor_name?: string
           changes?: Json
           created_at?: string
           id?: string
