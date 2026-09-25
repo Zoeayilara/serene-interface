@@ -267,14 +267,19 @@ export const deleteInventoryItem = createServerFn({ method: "POST" })
 
 // ── Categories ────────────────────────────────────────────────────────────────
 const catName = z.string().trim().min(2, "Category names need at least 2 characters.").max(80);
+const catDescription = z
+  .string()
+  .trim()
+  .max(300, "Keep the description under 300 characters.")
+  .default("");
 
 export const addCategory = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({ name: catName }).parse(data))
+  .inputValidator((data) => z.object({ name: catName, description: catDescription }).parse(data))
   .handler(async ({ data }) => {
     const { admin, supabase } = await ctx();
     const { error } = await supabase
       .from("categories")
-      .insert({ name: data.name, created_by: admin.id });
+      .insert({ name: data.name, description: data.description, created_by: admin.id });
     if (error)
       return {
         ok: false as const,
@@ -287,12 +292,14 @@ export const addCategory = createServerFn({ method: "POST" })
   });
 
 export const renameCategory = createServerFn({ method: "POST" })
-  .inputValidator((data) => z.object({ id: z.string().uuid(), name: catName }).parse(data))
+  .inputValidator((data) =>
+    z.object({ id: z.string().uuid(), name: catName, description: catDescription }).parse(data),
+  )
   .handler(async ({ data }) => {
     const { supabase } = await ctx();
     const { error } = await supabase
       .from("categories")
-      .update({ name: data.name })
+      .update({ name: data.name, description: data.description })
       .eq("id", data.id);
     if (error)
       return {
@@ -300,7 +307,7 @@ export const renameCategory = createServerFn({ method: "POST" })
         message:
           error.code === "23505"
             ? "That category already exists."
-            : "The category could not be renamed.",
+            : "The category could not be saved.",
       };
     return { ok: true as const };
   });

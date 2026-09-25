@@ -107,6 +107,8 @@ export function ItemForm({
     setCount(key, String(Math.max(0, (int(counts[key]) || 0) + delta)));
   }
 
+  const selectedCategory = categories.find((c) => c.id === categoryId);
+
   const dupe = existing.find(
     (x) =>
       x.id !== item?.id &&
@@ -200,6 +202,11 @@ export function ItemForm({
                 </option>
               ))}
             </select>
+            {selectedCategory?.description && (
+              <span className="mt-1.5 block text-xs font-normal text-muted-foreground">
+                {selectedCategory.description}
+              </span>
+            )}
           </label>
           <label className={labelClass}>
             Location

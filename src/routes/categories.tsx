@@ -32,8 +32,10 @@ function CategoriesPage() {
   const rename = useServerFn(renameCategory);
   const remove = useServerFn(deleteCategory);
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [editDescription, setEditDescription] = useState("");
   const [deleting, setDeleting] = useState<Category | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -63,13 +65,19 @@ function CategoriesPage() {
       toast.error("Category names need at least 2 characters.");
       return;
     }
-    if (await run(() => add({ data: { name: n } }), `Added ${n}`)) setName("");
+    if (
+      await run(() => add({ data: { name: n, description: description.trim() } }), `Added ${n}`)
+    ) {
+      setName("");
+      setDescription("");
+    }
   }
 
   async function submitRename(c: Category) {
     const n = editName.trim();
-    if (!n || n === c.name) return setEditingId(null);
-    if (await run(() => rename({ data: { id: c.id, name: n } }), `Renamed to ${n}`))
+    const d = editDescription.trim();
+    if (!n || (n === c.name && d === c.description)) return setEditingId(null);
+    if (await run(() => rename({ data: { id: c.id, name: n, description: d } }), `Saved ${n}`))
       setEditingId(null);
   }
 
@@ -82,15 +90,25 @@ function CategoriesPage() {
       <Panel>
         <form
           onSubmit={submitNew}
-          className="flex flex-col gap-2 border-b border-border p-4 sm:flex-row"
+          className="grid gap-2 border-b border-border p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_auto]"
         >
-          <label className="flex-1">
+          <label>
             <span className="sr-only">New category name</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={80}
-              placeholder="New category, e.g. Laptops"
+              placeholder="New category, e.g. Hardware Tools"
+              className={inputClass}
+            />
+          </label>
+          <label>
+            <span className="sr-only">What goes in it (optional)</span>
+            <input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={300}
+              placeholder="What goes in it (optional), e.g. Screwdrivers, multimeters"
               className={inputClass}
             />
           </label>
@@ -108,7 +126,7 @@ function CategoriesPage() {
           {data.categories.map((c) => (
             <li key={c.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
               {editingId === c.id ? (
-                <>
+                <div className="grid w-full gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_auto_auto]">
                   <input
                     autoFocus
                     value={editName}
@@ -119,18 +137,45 @@ function CategoriesPage() {
                       if (e.key === "Enter") submitRename(c);
                       if (e.key === "Escape") setEditingId(null);
                     }}
-                    className={`${inputClass} max-w-sm flex-1`}
+                    className={inputClass}
                   />
-                  <Button size="sm" disabled={busy} onClick={() => submitRename(c)}>
+                  <input
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    maxLength={300}
+                    aria-label="What goes in it"
+                    placeholder="What goes in it (optional)"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") submitRename(c);
+                      if (e.key === "Escape") setEditingId(null);
+                    }}
+                    className={inputClass}
+                  />
+                  <Button
+                    size="sm"
+                    className="h-10"
+                    disabled={busy}
+                    onClick={() => submitRename(c)}
+                  >
                     Save
                   </Button>
-                  <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
+                  <Button
+                    size="sm"
+                    className="h-10"
+                    variant="outline"
+                    onClick={() => setEditingId(null)}
+                  >
                     Cancel
                   </Button>
-                </>
+                </div>
               ) : (
                 <>
-                  <span className="min-w-0 flex-1 font-semibold">{c.name}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold">{c.name}</p>
+                    {c.description && (
+                      <p className="mt-0.5 text-sm text-muted-foreground">{c.description}</p>
+                    )}
+                  </div>
                   <span className="text-sm text-muted-foreground">
                     {c.item_count} {c.item_count === 1 ? "item" : "items"}
                   </span>
@@ -140,10 +185,11 @@ function CategoriesPage() {
                     onClick={() => {
                       setEditingId(c.id);
                       setEditName(c.name);
+                      setEditDescription(c.description ?? "");
                     }}
                   >
                     <Pencil />
-                    Rename
+                    Edit
                   </Button>
                   <Button
                     size="sm"
