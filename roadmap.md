@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Build secure administrator authentication and authorization
+- [ ] Build one shared administrator username/password gate with encrypted session
 - [ ] Build persistent inventory, categories, and audit history
 - [ ] Build responsive dashboard and inventory workflows
 - [ ] Add light and dark themes
