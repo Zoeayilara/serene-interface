@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { LockKeyhole } from "lucide-react";
+import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { ThemeButton } from "@/components/app-shell";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,16 +102,32 @@ function LoginPage() {
                 className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-base outline-none focus:ring-2 focus:ring-ring sm:text-sm"
               />
             </label>
-            <label className="mt-4 block text-sm font-semibold">
+            <label htmlFor="login-password" className="mt-4 block text-sm font-semibold">
               Password
-              <input
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="mt-2 h-11 w-full rounded-lg border border-input bg-background px-3 text-base outline-none focus:ring-2 focus:ring-ring sm:text-sm"
-              />
             </label>
+            <div className="relative mt-2">
+              <input
+                id="login-password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                required
+                className="h-11 w-full rounded-lg border border-input bg-background pl-3 pr-11 text-base outline-none focus:ring-2 focus:ring-ring sm:text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((s) => !s)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                title={showPassword ? "Hide password" : "Show password"}
+                className="absolute inset-y-0 right-0 grid w-11 place-items-center rounded-r-lg text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
             {error && (
               <p
                 role="alert"
