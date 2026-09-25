@@ -9,6 +9,10 @@
   # Build the server for Netlify instead of Cloudflare (the Lovable default).
   NITRO_PRESET = "netlify"
   NODE_VERSION = "22"
+  # The admin username (e.g. "director") isn't secret and naturally appears in the
+  # code ("hardware_director"), so don't let Netlify's secret scanner block on it.
+  # Passwords and keys are still scanned.
+  SECRETS_SCAN_OMIT_KEYS = "ADMIN_USERNAME"
 
 # Basic hardening for every page.
 [[headers]]
